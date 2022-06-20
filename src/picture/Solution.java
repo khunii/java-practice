@@ -25,12 +25,15 @@ class Solution {
                         if (area.amImember(new int[] {i,j})) {
                             area.addMemberList(members);
                             isNew = false;
+                        }else if (area.areTheyMember(members)){//내 상/하/좌/우 주변이 구역의 멤버면 나도 멤버임
+                            area.addMember(new int[] {i,j});
+                            isNew = false;
                         }
                     }
                     if (isNew) {
                         Area newArea = new Area(picture[i][j]);
                         newArea.addMemberList(members);
-                        //newArea.addMember(new int[] {i,j});//자기 자신도 member여야지...
+                        newArea.addMember(new int[] {i,j});//자기 자신도 member여야지...
                         areaList.add(newArea);
                     }
                 }
@@ -50,7 +53,6 @@ class Solution {
 
         List<Integer[]> members = new ArrayList<>();
         int color = picture[i][j];
-        members.add(new Integer[] {i, j}); //자신은 default
         if (i>0) if (picture[i-1][j] == color) members.add(new Integer[] {i-1, j});//상
         if (i<picture.length-1) if (picture[i+1][j] == color) members.add(new Integer[] {i+1, j});//하
         if (j>0) if (picture[i][j-1] == color) members.add(new Integer[] {i, j-1});//좌
@@ -70,8 +72,20 @@ class Solution {
             }
             return false;
         }
+        public boolean areTheyMember(List<Integer[]> they){
+            for(Integer[] heOrShe:they) {
+                for (Integer[] e : members) {
+                    if (heOrShe[0].equals(e[0]) && heOrShe[1].equals(e[1])){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
         private void addMember(int[] position) {
-            members.add(Arrays.stream(position).boxed().toArray(Integer[]::new));
+            if (!amImember(position)) {
+                members.add(Arrays.stream(position).boxed().toArray(Integer[]::new));
+            }
         }
         public void addMemberList(List<Integer[]> positions) {
             for(Integer[] position:positions) {
@@ -83,5 +97,43 @@ class Solution {
         public int count() {
             return members.size();
         }
+    }
+
+    public static void main(String[] args){
+        Solution s = new Solution();
+//        int[][] picture = {
+//                {1, 1, 1, 0},
+//                {1, 2, 2, 0},
+//                {1, 0, 0, 1},
+//                {0, 0, 0, 1},
+//                {0, 0, 0, 3},
+//                {0, 0, 0, 3}
+//        };
+        int[][] picture = {
+                {0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0},
+                {0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0},
+                {0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0},
+                {0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0},
+                {0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0},
+                {0,1,1,1,1,0,1,1,1,1,0,1,1,1,1,0},
+                {0,1,1,1,0,1,0,1,1,0,1,0,1,1,1,0},
+                {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
+                {0,1,2,2,2,1,1,1,1,1,1,2,2,2,1,0},
+                {0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0},
+                {0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0},
+                {0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0},
+                {0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0}
+        };
+
+        int[] answer = s.solution(picture.length, picture[0].length, picture);
+        System.out.println(Arrays.toString(answer));//answer [12, 120]
+
+        int sum = 0;
+        for(int i = 0; i<picture.length; i++){
+            for(int j = 0; j<picture[i].length; j++){
+                sum += picture[i][j] == 1? picture[i][j] : 0;
+            }
+        }
+        System.out.println(sum);
     }
 }
